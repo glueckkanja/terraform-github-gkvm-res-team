@@ -1,3 +1,2 @@
-# terraform-azurerm-avm-template
+# terraform-github-gkvm-res-team
 
-This is a template repo for Terraform Azure Verified Modules.
