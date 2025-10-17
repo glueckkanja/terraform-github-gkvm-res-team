@@ -36,3 +36,13 @@ resource "github_team_members" "this" {
     }
   }
 }
+
+resource "github_team_repository" "this" {
+  for_each = {
+    for repo in var.repository_permissions : repo.repository => repo
+  }
+  team_id    = github_team.this.id
+  repository = each.value.repository
+
+  permission = each.value.permission
+}
