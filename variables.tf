@@ -9,68 +9,17 @@ variable "name" {
   }
 }
 
-variable "description" {
-  type        = string
-  description = "(Optional) The description of the team."
-  default     = null
-  nullable    = true
-}
-
-variable "privacy" {
-  type        = string
-  description = "(Optional) The privacy level of the team. Allowed values are 'secret' and 'closed'."
-  default     = "secret"
-  nullable    = false
-
-  validation {
-    condition     = var.privacy == "secret" || var.privacy == "closed"
-    error_message = "The 'privacy' variable must be either 'secret' or 'closed'."
-  }
-}
-
-variable "parent_team_id" {
-  type        = string
-  description = "(Optional) The ID of the parent team for creating a nested team."
-  default     = null
-  nullable    = true
-}
-
-variable "ldap_cdn" {
-  type        = string
-  description = "(Optional) The LDAP Distinguished Name of the group where membership will be synchronized. Only available in GitHub Enterprise Server."
-  default     = null
-  nullable    = true
-}
-
 variable "create_default_maintainer" {
   type        = bool
-  description = "(Optional) Whether to create a default maintainer for the team."
   default     = false
+  description = "(Optional) Whether to create a default maintainer for the team."
   nullable    = false
 }
 
-variable "members" {
-  type        = list(string)
-  description = "(Optional) A list of GitHub usernames to add as members of the team."
-  default     = []
-  nullable    = false
-}
-
-variable "maintainers" {
-  type        = list(string)
-  description = "(Optional) A list of GitHub usernames to add as maintainers of the team."
-  default     = []
-  nullable    = false
-}
-
-variable "repository_permissions" {
-  type = list(object({
-    repository  = string
-    permission  = optional(string, "pull")
-  }))
-  description = "(Optional) A list of repository permissions to assign to the team."
-  default     = []
-  nullable    = false
+variable "description" {
+  type        = string
+  default     = null
+  description = "(Optional) The description of the team."
 }
 
 variable "enable_telemetry" {
@@ -81,5 +30,53 @@ This variable controls whether or not telemetry is enabled for the module.
 For more information see <https://aka.ms/avm/telemetryinfo>.
 If it is set to false, then no telemetry will be collected.
 DESCRIPTION
+  nullable    = false
+}
+
+variable "ldap_cdn" {
+  type        = string
+  default     = null
+  description = "(Optional) The LDAP Distinguished Name of the group where membership will be synchronized. Only available in GitHub Enterprise Server."
+}
+
+variable "maintainers" {
+  type        = list(string)
+  default     = []
+  description = "(Optional) A list of GitHub usernames to add as maintainers of the team."
+  nullable    = false
+}
+
+variable "members" {
+  type        = list(string)
+  default     = []
+  description = "(Optional) A list of GitHub usernames to add as members of the team."
+  nullable    = false
+}
+
+variable "parent_team_id" {
+  type        = string
+  default     = null
+  description = "(Optional) The ID of the parent team for creating a nested team."
+}
+
+variable "privacy" {
+  type        = string
+  default     = "secret"
+  description = "(Optional) The privacy level of the team. Allowed values are 'secret' and 'closed'."
+  nullable    = false
+
+  validation {
+    condition     = var.privacy == "secret" || var.privacy == "closed"
+    error_message = "The 'privacy' variable must be either 'secret' or 'closed'."
+  }
+}
+
+variable "repository_permissions" {
+  type = list(object({
+    repository = string
+    permission = optional(string, "pull")
+  }))
+  default     = []
+  description = "(Optional) A list of repository permissions to assign to the team."
   nullable    = false
 }
