@@ -30,6 +30,24 @@ module "github_team" {
 }
 ```
 
+### Team membership
+
+`members` and `maintainers` are combined into a single authoritative
+`github_team_members` resource: anyone not listed is removed from the team.
+
+Two rules follow from how GitHub behaves, and the module enforces the first:
+
+- **A team with members must have at least one maintainer.** GitHub automatically
+  promotes a member to maintainer when a team has none, which Terraform then tries
+  to demote on the next plan, producing a diff that never converges. Passing
+  `members` without `maintainers` is rejected at plan time.
+- **Do not list an organisation owner under `members`.** GitHub grants owners the
+  maintainer role regardless, causing the same perpetual diff. List them under
+  `maintainers` instead.
+
+Leaving both lists empty is supported: the module then creates the team but does
+not manage its membership at all, and members added by other means are left alone.
+
 ### Example - Referencing the team from another module
 
 The team ID is exported as `resource_id`. Terraform types every resource ID as a
@@ -79,14 +97,6 @@ Type: `string`
 ## Optional Inputs
 
 The following input variables are optional (have default values):
-
-### <a name="input_create_default_maintainer"></a> [create\_default\_maintainer](#input\_create\_default\_maintainer)
-
-Description: (Optional) Whether to create a default maintainer for the team.
-
-Type: `bool`
-
-Default: `false`
 
 ### <a name="input_description"></a> [description](#input\_description)
 
@@ -181,7 +191,10 @@ Description: A map of the created repository grants, keyed by repository name.
 
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
-Description: The full `github_team` resource object.
+Description: The `github_team` resource object. Every attribute of the resource is exposed  
+except the deprecated `create_default_maintainer`, which is omitted so that  
+consuming this output does not raise the provider's deprecation warning. New  
+provider attributes are not picked up automatically; add them here.
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 

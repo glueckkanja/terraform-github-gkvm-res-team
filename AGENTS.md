@@ -59,6 +59,29 @@ Commit any regenerated documentation — CI fails on README drift.
 
 Examples are generated with `examples/.terraform-docs.yml`, not the root config: the example config embeds its own HCL source via `{{ include "main.tf" }}`, which the root config does not.
 
+## Provider constraints worth knowing
+
+These are properties of `integrations/github`, not choices this module is free to make:
+
+- **`github_team_members.members` is `Min: 1`.** A `dynamic "members"` block that
+  produces zero blocks fails with `Insufficient members blocks`. Hence the
+  `count` guard on the resource — do not remove it without also making membership
+  mandatory.
+- **`github_team_members` is authoritative.** It removes every user not listed.
+- **GitHub auto-promotes a maintainer** when a team has none, and always grants
+  organisation owners the maintainer role. Either produces a perpetual diff
+  against a `role = "member"` entry. The `maintainers` validation guards the first
+  case; the second cannot be detected at plan time and is documented instead.
+- **`github_team.create_default_maintainer` and `github_team_members.team_id` are
+  deprecated** and are not used. Use `team_slug`. Note `github_team_repository.team_id`
+  is *not* deprecated and is still correct.
+- **Deprecation warnings fire on known, non-null values.** They do not surface in
+  `terraform validate`, because it treats input variables as unknown — which is why
+  CI stays green while `terraform plan` warns. The `resource` output is built as an
+  explicit object literal rather than `github_team.this` for exactly this reason;
+  referencing the whole object reads the deprecated attribute and warns. Add new
+  provider attributes to that literal by hand.
+
 ## Conventions
 
 - **Commits:** Conventional Commits; `!` marks a breaking change.
