@@ -1,0 +1,94 @@
+---
+name: CI
+
+on:
+  pull_request:
+    types: ['opened', 'reopened', 'synchronize']
+  push:
+    branches: ['main']
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: '1'
+
+jobs:
+  fmt:
+    name: terraform fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_wrapper: false
+      - name: terraform fmt -check
+        run: terraform fmt -check -recursive -diff
+
+  validate:
+    name: terraform validate
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dir:
+          - '.'
+          - 'examples/default'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_wrapper: false
+      - name: terraform init
+        run: terraform -chdir=${{ matrix.dir }} init -backend=false -input=false
+      - name: terraform validate
+        run: terraform -chdir=${{ matrix.dir }} validate
+
+  tflint:
+    name: tflint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: terraform-linters/setup-tflint@90f302c255ef959cbfb4bd10581afecdb7ece3e6 # v4.1.1
+        with:
+          tflint_version: v0.61.0
+      - name: tflint --init
+        run: tflint --init
+      - name: tflint
+        run: tflint --recursive --minimum-failure-severity=error
+
+  docs:
+    name: terraform-docs drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: install terraform-docs
+        # Unpack outside the working tree, so the download does not show up as
+        # an untracked file in the drift check below.
+        run: |
+          tmp="$(mktemp -d)"
+          curl -sSLo "$tmp/terraform-docs.tar.gz" \
+            https://terraform-docs.io/dl/v0.24.0/terraform-docs-v0.24.0-linux-amd64.tar.gz
+          tar -xzf "$tmp/terraform-docs.tar.gz" -C "$tmp" terraform-docs
+          chmod +x "$tmp/terraform-docs"
+          sudo mv "$tmp/terraform-docs" /usr/local/bin/
+          rm -rf "$tmp"
+          terraform-docs --version
+      - name: regenerate docs
+        run: |
+          terraform-docs -c .terraform-docs.yml .
+          for e in examples/*/; do
+            terraform-docs -c examples/.terraform-docs.yml "$e"
+          done
+      - name: fail on drift
+        run: |
+          if [ -n "$(git status --porcelain -- '*.md')" ]; then
+            echo "::error::README drift detected. Regenerate docs and commit:"
+            echo "  terraform-docs -c .terraform-docs.yml ."
+            echo "  for e in examples/*/; do terraform-docs -c examples/.terraform-docs.yml \"\$e\"; done"
+            git --no-pager diff
+            exit 1
+          fi
+          echo "Docs are up to date."

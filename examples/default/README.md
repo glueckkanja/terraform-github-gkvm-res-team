@@ -11,24 +11,15 @@ terraform {
   required_providers {
     github = {
       source  = "integrations/github"
-      version = "~> 6.6"
-    }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
+      version = "~> 6.13"
     }
   }
 }
 
-provider "github" {
-}
-
-provider "modtm" {
-  enabled = false
-}
+provider "github" {}
 
 module "team" {
-  source = "../../modules/team"
+  source = "../../"
 
   name        = "example-team"
   description = "An example GitHub team"
@@ -43,9 +34,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
-- <a name="requirement_github"></a> [github](#requirement\_github) (~> 6.6)
-
-- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
+- <a name="requirement_github"></a> [github](#requirement\_github) (~> 6.13)
 
 ## Resources
 
@@ -58,17 +47,7 @@ No required inputs.
 
 ## Optional Inputs
 
-The following input variables are optional (have default values):
-
-### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
-
-Description: This variable controls whether or not telemetry is enabled for the module.  
-For more information see <https://aka.ms/avm/telemetryinfo>.  
-If it is set to false, then no telemetry will be collected.
-
-Type: `bool`
-
-Default: `true`
+No optional inputs.
 
 ## Outputs
 
@@ -80,12 +59,9 @@ The following Modules are called:
 
 ### <a name="module_team"></a> [team](#module\_team)
 
-Source: ../../modules/team
+Source: ../../
 
 Version:
 
 <!-- markdownlint-disable-next-line MD041 -->
-## Data Collection
-
-The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft’s privacy statement. Our privacy statement is located at <https://go.microsoft.com/fwlink/?LinkID=824704>. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
 <!-- END_TF_DOCS -->
