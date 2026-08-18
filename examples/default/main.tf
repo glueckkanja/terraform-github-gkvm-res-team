@@ -4,24 +4,15 @@ terraform {
   required_providers {
     github = {
       source  = "integrations/github"
-      version = "~> 6.6"
-    }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
+      version = "~> 6.13"
     }
   }
 }
 
-provider "github" {
-}
-
-provider "modtm" {
-  enabled = false
-}
+provider "github" {}
 
 module "team" {
-  source = "../../modules/team"
+  source = "../../"
 
   name        = "example-team"
   description = "An example GitHub team"
