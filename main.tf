@@ -1,11 +1,10 @@
 resource "github_team" "this" {
   name = var.name
 
-  description               = var.description
-  privacy                   = var.privacy
-  parent_team_id            = var.parent_team_id
-  ldap_dn                   = var.ldap_cdn
-  create_default_maintainer = var.create_default_maintainer
+  description    = var.description
+  privacy        = var.privacy
+  parent_team_id = var.parent_team_id
+  ldap_dn        = var.ldap_cdn
 }
 
 locals {
@@ -25,8 +24,15 @@ locals {
   )
 }
 
+moved {
+  from = github_team_members.this
+  to   = github_team_members.this[0]
+}
+
 resource "github_team_members" "this" {
-  team_id = github_team.this.id
+  count = length(local.members) > 0 ? 1 : 0
+
+  team_slug = github_team.this.slug
 
   dynamic "members" {
     for_each = local.members

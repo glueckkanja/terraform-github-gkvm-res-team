@@ -9,13 +9,6 @@ variable "name" {
   }
 }
 
-variable "create_default_maintainer" {
-  type        = bool
-  default     = false
-  description = "(Optional) Whether to create a default maintainer for the team."
-  nullable    = false
-}
-
 variable "description" {
   type        = string
   default     = null
@@ -33,6 +26,11 @@ variable "maintainers" {
   default     = []
   description = "(Optional) A list of GitHub usernames to add as maintainers of the team."
   nullable    = false
+
+  validation {
+    condition     = length(var.members) == 0 || length(var.maintainers) > 0
+    error_message = "At least one maintainer is required when 'members' is non-empty. GitHub automatically promotes a member to maintainer when a team has none, which Terraform then tries to demote on every plan, producing a perpetual diff."
+  }
 }
 
 variable "members" {

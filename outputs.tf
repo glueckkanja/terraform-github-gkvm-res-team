@@ -1,6 +1,25 @@
 output "resource" {
-  description = "The full `github_team` resource object."
-  value       = github_team.this
+  description = <<DESCRIPTION
+The `github_team` resource object. Every attribute of the resource is exposed
+except the deprecated `create_default_maintainer`, which is omitted so that
+consuming this output does not raise the provider's deprecation warning. New
+provider attributes are not picked up automatically; add them here.
+DESCRIPTION
+  value = {
+    description           = github_team.this.description
+    etag                  = github_team.this.etag
+    id                    = github_team.this.id
+    ldap_dn               = github_team.this.ldap_dn
+    members_count         = github_team.this.members_count
+    name                  = github_team.this.name
+    node_id               = github_team.this.node_id
+    notification_setting  = github_team.this.notification_setting
+    parent_team_id        = github_team.this.parent_team_id
+    parent_team_read_id   = github_team.this.parent_team_read_id
+    parent_team_read_slug = github_team.this.parent_team_read_slug
+    privacy               = github_team.this.privacy
+    slug                  = github_team.this.slug
+  }
 }
 
 output "resource_id" {
