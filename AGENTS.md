@@ -81,6 +81,12 @@ These are properties of `integrations/github`, not choices this module is free t
   explicit object literal rather than `github_team.this` for exactly this reason;
   referencing the whole object reads the deprecated attribute and warns. Add new
   provider attributes to that literal by hand.
+- **`etag` is excluded from the `resource` output.** It is the GitHub API's HTTP
+  cache validator. The provider sends it as `If-None-Match` on read and stores
+  whatever comes back, and GitHub's weak team etags rotate independently of the
+  team itself, so including it would make the output change on almost every
+  refresh. Provider 6.13 also reports each rotation as external drift; upstream
+  has since added `DiffSuppressOnRefresh` to the attribute, but that is unreleased.
 
 ## Conventions
 

@@ -1,13 +1,14 @@
 output "resource" {
   description = <<DESCRIPTION
 The `github_team` resource object. Every attribute of the resource is exposed
-except the deprecated `create_default_maintainer`, which is omitted so that
-consuming this output does not raise the provider's deprecation warning. New
-provider attributes are not picked up automatically; add them here.
+except two: the deprecated `create_default_maintainer`, so that consuming this
+output does not raise the provider's deprecation warning, and `etag`, which is
+an HTTP cache validator that GitHub rotates independently of the team and which
+would otherwise make this output change on almost every refresh. New provider
+attributes are not picked up automatically; add them here.
 DESCRIPTION
   value = {
     description           = github_team.this.description
-    etag                  = github_team.this.etag
     id                    = github_team.this.id
     ldap_dn               = github_team.this.ldap_dn
     members_count         = github_team.this.members_count
