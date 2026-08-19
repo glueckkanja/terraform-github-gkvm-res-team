@@ -192,9 +192,11 @@ Description: A map of the created repository grants, keyed by repository name.
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: The `github_team` resource object. Every attribute of the resource is exposed  
-except the deprecated `create_default_maintainer`, which is omitted so that  
-consuming this output does not raise the provider's deprecation warning. New  
-provider attributes are not picked up automatically; add them here.
+except two: the deprecated `create_default_maintainer`, so that consuming this  
+output does not raise the provider's deprecation warning, and `etag`, which is  
+an HTTP cache validator that GitHub rotates independently of the team and which  
+would otherwise make this output change on almost every refresh. New provider  
+attributes are not picked up automatically; add them here.
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
