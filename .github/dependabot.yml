@@ -1,0 +1,16 @@
+---
+version: 2
+updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    # Delay adopting freshly published releases so a compromised or yanked
+    # release is caught upstream before it lands here.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: 'ci'
+    labels:
+      - 'dependencies'
+      - 'github-actions'
