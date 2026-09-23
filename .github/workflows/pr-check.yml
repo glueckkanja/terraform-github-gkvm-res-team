@@ -1,0 +1,41 @@
+---
+# GKVM checks. All logic lives in glueckkanja/gkvm-tools; this file only
+# selects the version and the options. Bump the SHA with dependabot.
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: [main]
+  merge_group:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pr-check-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  gkvm:
+    # A called workflow can only lower these, so grant exactly what its jobs
+    # ask for: read sources, pull the image, request the OIDC token.
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+    uses: glueckkanja/gkvm-tools/.github/workflows/terraform-module.yml@9c68b6a0cc9ce93a69c024dbaa2aa391d39046d1 # v0.1.1
+    with:
+      # auto | base | azure | github
+      profile: auto
+      # tofu | terraform
+      binary: tofu
+      # off | smoke (plan) | e2e (apply + destroy); smoke and e2e need the
+      # "test" environment with credentials
+      examples: "off"
+    # Organisation secrets for example runs (only used when examples != off).
+    secrets:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
