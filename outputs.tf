@@ -1,3 +1,33 @@
+output "description" {
+  description = "The description of the team, or `null` when none is set."
+  value       = github_team.this.description
+}
+
+output "members_count" {
+  description = "The number of members in the team, as reported by GitHub."
+  value       = github_team.this.members_count
+}
+
+output "name" {
+  description = "The name of the team."
+  value       = github_team.this.name
+}
+
+output "node_id" {
+  description = "The GraphQL global node ID of the team, for use with the v4 API."
+  value       = github_team.this.node_id
+}
+
+output "privacy" {
+  description = "The privacy level of the team."
+  value       = github_team.this.privacy
+}
+
+output "repository_permissions" {
+  description = "A map of the created repository grants, keyed by repository name."
+  value       = { for k, v in github_team_repository.this : k => v }
+}
+
 output "resource" {
   description = <<DESCRIPTION
 The `github_team` resource object. Every attribute of the resource is exposed
@@ -28,37 +58,7 @@ output "resource_id" {
   value       = github_team.this.id
 }
 
-output "name" {
-  description = "The name of the team."
-  value       = github_team.this.name
-}
-
 output "slug" {
   description = "The URL slug of the team, in the form used by the GitHub API and by `github_team_repository`."
   value       = github_team.this.slug
-}
-
-output "node_id" {
-  description = "The GraphQL global node ID of the team, for use with the v4 API."
-  value       = github_team.this.node_id
-}
-
-output "description" {
-  description = "The description of the team, or `null` when none is set."
-  value       = github_team.this.description
-}
-
-output "privacy" {
-  description = "The privacy level of the team."
-  value       = github_team.this.privacy
-}
-
-output "members_count" {
-  description = "The number of members in the team, as reported by GitHub."
-  value       = github_team.this.members_count
-}
-
-output "repository_permissions" {
-  description = "A map of the created repository grants, keyed by repository name."
-  value       = { for k, v in github_team_repository.this : k => v }
 }
