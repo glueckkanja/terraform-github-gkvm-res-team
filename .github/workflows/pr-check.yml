@@ -22,10 +22,10 @@ jobs:
     # A called workflow can only lower these, so grant exactly what its jobs
     # ask for: read sources, pull the image, request the OIDC token.
     permissions:
-      contents: read
-      packages: read
-      id-token: write
-    uses: glueckkanja/gkvm-tools/.github/workflows/terraform-module.yml@9c68b6a0cc9ce93a69c024dbaa2aa391d39046d1 # v0.1.1
+      contents: read # Required to check out the module sources.
+      packages: read # Required to pull the gkvm-tools image from GHCR.
+      id-token: write # Required for the providers' OIDC login in example runs.
+    uses: glueckkanja/gkvm-tools/.github/workflows/terraform-module.yml@32dbc969db8c848270b2a13390da3132b79a0651 # v0.1.3
     with:
       # auto | base | azure | github
       profile: auto
@@ -33,9 +33,12 @@ jobs:
       binary: tofu
       # off | smoke (plan) | e2e (apply + destroy); smoke and e2e need the
       # "test" environment with credentials
-      examples: "off"
-    # Organisation secrets for example runs (only used when examples != off).
-    secrets:
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      #
+      # e2e creates and deletes the example team in the gkvm-e2e organization,
+      # authenticating as the GitHub App whose private key is the environment
+      # secret GKVM_GITHUB_APP_PEM_FILE.
+      examples: e2e
+    # Environment-scoped ARM_*_OVERRIDE secrets on "test" only resolve inside
+    # the called job that declares the environment, so they cannot be mapped
+    # explicitly here.
+    secrets: inherit # zizmor: ignore[secrets-inherit]

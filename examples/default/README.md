@@ -13,15 +13,31 @@ terraform {
       source  = "integrations/github"
       version = "~> 6.13"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.5"
+    }
   }
 }
 
 provider "github" {}
 
+# The end-to-end test creates this team for real and deletes it again, so the
+# name has to be unique per run: a fixed name collides between concurrent runs,
+# and a leftover from a cancelled run would block the next one. The gkvm-e2e-
+# prefix makes any leftover recognisable.
+resource "random_string" "suffix" {
+  length  = 6
+  lower   = true
+  numeric = true
+  special = false
+  upper   = false
+}
+
 module "team" {
   source = "../../"
 
-  name        = "example-team"
+  name        = "gkvm-e2e-team-${random_string.suffix.result}"
   description = "An example GitHub team"
   privacy     = "closed"
 }
@@ -36,9 +52,13 @@ The following requirements are needed by this module:
 
 - <a name="requirement_github"></a> [github](#requirement\_github) (~> 6.13)
 
+- <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
+
 ## Resources
 
-No resources.
+The following resources are used by this module:
+
+- [random_string.suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
