@@ -32,6 +32,7 @@ outputs.tf               root outputs
 terraform.tf             required_version + required_providers
 examples/default/        the published example
 _header.md / _footer.md  terraform-docs fragments for the root README
+tests/unit/              tofu test suite with a mock provider, see tests/README.md
 ```
 
 ## Validating
@@ -44,6 +45,8 @@ Run the same checks CI runs before opening a pull request. Both need Docker (the
 ```
 
 Commit whatever `pre-commit` changes: CI fails on README or formatting drift.
+
+A change to an input validation or to the `for_each` key of `github_team_repository.this` needs a matching unit test in `tests/unit/`.
 
 `tofu validate` emits a deprecation warning for `create_default_maintainer` whenever the `resource` output is evaluated. That warning originates in the provider, is reported against the whole-resource output rather than the input, and is expected.
 
